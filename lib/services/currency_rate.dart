@@ -6,9 +6,9 @@ class Currency {
   var _apiEndpoint = 'latest';
   var jsonResponse;
   var base = 'EUR'; // Default base
-  var target = 'EUR'; // Default target
+  var target = 'USD'; // Default target
   double baseValue = 1; // Default base value
-  double targetValue;
+  double targetValue = 0;
 
   Future<void> getCurrencyRate() async {
     var response = await get(
@@ -32,6 +32,8 @@ class Currency {
     } else {
       targetValue = baseValue;
     }
+
+    targetValue = double.parse(targetValue.toStringAsFixed(2));
 
     print('$base: $baseValue = $target: $targetValue');
   }

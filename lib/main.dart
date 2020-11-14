@@ -22,8 +22,13 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
+  Currency currency;
+  var baseDropDownValue = 'EUR';
+  var targetDropDownValue = 'USD';
+  double targetValue;
+
   void createInstance() async {
-    var currency = Currency();
+    currency = Currency();
     await currency.getCurrencyRate();
     currency.convertCurrency();
   }
@@ -32,6 +37,7 @@ class _BodyState extends State<Body> {
   void initState() {
     super.initState();
     createInstance();
+    targetValue = currency.targetValue;
   }
 
   @override
@@ -45,15 +51,120 @@ class _BodyState extends State<Body> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
+                flex: 13,
                 child: TextField(
-                  onChanged: (value) => print(value),
+                  onChanged: (value) {
+                    currency.baseValue = double.parse(value);
+                    currency.convertCurrency();
+                    setState(() {
+                      targetValue = currency.targetValue;
+                    });
+                  },
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    hintText: '0',
+                    hintText: '0.0',
                     border: OutlineInputBorder(),
                   ),
                 ),
               ),
+              Expanded(
+                flex: 1,
+                child: SizedBox(),
+              ),
+              Expanded(
+                flex: 6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  padding: EdgeInsets.all(4),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      value: baseDropDownValue,
+                      icon: Icon(
+                        Icons.arrow_right,
+                      ),
+                      onChanged: (value) {
+                        currency.base = value;
+                        currency.convertCurrency();
+                        setState(() {
+                          baseDropDownValue = value;
+                          targetValue = currency.targetValue;
+                        });
+                      },
+                      items: <String>[
+                        'MYR',
+                        'USD',
+                        'EUR',
+                      ]
+                          .map((value) => DropdownMenuItem(
+                                value: value,
+                                child: Text(value),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                flex: 13,
+                child: TextField(
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    hintText: targetValue.toString(),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: SizedBox(),
+              ),
+              Expanded(
+                flex: 6,
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(width: 1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  padding: EdgeInsets.all(4),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton(
+                      value: targetDropDownValue,
+                      icon: Icon(
+                        Icons.arrow_right,
+                      ),
+                      onChanged: (value) {
+                        currency.target = value;
+                        currency.convertCurrency();
+                        setState(() {
+                          targetDropDownValue = value;
+                          targetValue = currency.targetValue;
+                        });
+                      },
+                      items: <String>[
+                        'MYR',
+                        'USD',
+                        'EUR',
+                      ]
+                          .map((value) => DropdownMenuItem(
+                                value: value,
+                                child: Text(value),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                ),
+              )
             ],
           )
         ],
